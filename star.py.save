@@ -1,0 +1,15 @@
+import turtle
+
+wn = turtle.Screen()
+
+star = turtle.Turtle()
+star.pensize(5)
+star.hideturtle()
+star.left(45)
+angle = 45
+
+for i in range(5):
+	star.forward(200)
+	star.left(140)
+
+wn.mainloop()

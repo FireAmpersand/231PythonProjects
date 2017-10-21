@@ -1,0 +1,52 @@
+import turtle
+
+xc,yc = eval(input())
+r = eval(input())
+x1,y1 = eval(input())
+x2,y2 = eval(input())
+
+wn = turtle.Screen()
+turtle1 = turtle.Turtle()
+turtle2 = turtle.Turtle()
+turtle1.speed(9)
+turtle2.speed(9)
+
+def drawTurtles(lineTurtle,circleTurtle):
+	"Draws The Turtles On The Screen"
+	circleTurtle.penup()
+	circleTurtle.setx(xc)
+	circleTurtle.sety(yc - r)
+	circleTurtle.pendown()
+	circleTurtle.circle(r)
+
+	lineTurtle.penup()
+	lineTurtle.setx(x1)
+	lineTurtle.sety(y1 - 6)
+	lineTurtle.pendown()
+	lineTurtle.circle(6)
+	lineTurtle.penup()
+	lineTurtle.sety(y1)
+	lineTurtle.pendown()
+	lineTurtle.goto(x2,y2)
+	lineTurtle.penup()
+	lineTurtle.sety(y2 - 6)
+	lineTurtle.pendown()
+	lineTurtle.circle(6)
+
+def solvingIntersections():
+	"Calculating the intersections"
+	a = ( (x2-x1) ** 2) + ( (y2-y1) ** 2)
+	b = 2 * ( (x1-xc) * (x2-x1) + (y1-yc) * (y2-y1) )
+	c = ( (x1-xc) ** 2) + ( (y1-yc) **  2) - (r**2)
+	root = ( (b**2) - (4*a*c) ) ** (0.5)
+	quadradic1 = ( (b*-1) + root ) / ( 2 * a )
+	quadradic2 = ( (b*-1) - root ) / ( 2 * a )
+	print(quadradic1)
+	print(qua
+
+def drawIntersections(point1, point2)
+
+solvingIntersections()
+drawTurtles(turtle1,turtle2)
+wn.mainloop()
+
