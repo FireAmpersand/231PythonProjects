@@ -3,6 +3,7 @@
 #	      30043532		  #
 #	      CPSC 231		  #
 ###################################
+#Hat Print Statements are in aiChangeHatWin and aiChangeHatLose
 
 import random
 
@@ -12,6 +13,7 @@ def main():
 	oldAIHat = []
 	while(playAgain == 1):
 		totalNuts, gameMode = gameSetup()
+		print('')
 		if(gameMode == 1):
 			#Runs a Human Vs Human Game
 			playAgain = humanVsHumanGame(totalNuts)
@@ -20,17 +22,17 @@ def main():
 			oldAIHat, playAgain = humanVsAIGame(totalNuts, oldAIHat)
 		else:
 			#Runs a Human Vs Trained Ai Game
-			humanVsSmartAIGame(totalNuts)
+			playAgain = humanVsSmartAIGame(totalNuts)
 
 
 def humanVsSmartAIGame(totalNuts):
-	"Simulates 1000 games where the AI plays its self, then a human can challenge the AI"
+	"Simulates 100000 games where the AI plays its self, then a human can challenge the AI"
 	#Creating the hats that the AIs will need
 	aiHatOne = aiHatBuilder(totalNuts,1)
 	aiHatTwo = aiHatBuilder(totalNuts,1)
 	print("Training AI, Please Wait")
 	#Looping through 1000 games
-	for i in range(1000):
+	for i in range(100000):
 		#Reseting variables every loop
 		remainingNuts = totalNuts
 		player = 1
@@ -66,6 +68,8 @@ def humanVsSmartAIGame(totalNuts):
 	#Loops through a humanVSAI Game
 	while(playAgain == 1):
 		aiHat, playAgain = humanVsAIGame(totalNuts,aiHat)
+		if (playAgain == 0):
+			return(playAgain)
 
 
 def humanVsAIGame(totalNuts,oldAIHat):
@@ -157,6 +161,7 @@ def humanTurn(player,remainingNuts):
 	"Allows the human player to input thier selection, where player is the player number and remainingNuts is nuts left on table, returns play again and remaining nuts"
 	print("There are {0} remaining nuts on the board".format(remainingNuts))
 	take = int(input("Player {0}: How many nuts do you take (1-3)? ".format(player)))
+	print("")
 	while(take < 1 or take > 3): #Check to make sure selection is vailid
 		take = int(input("Invaild Number (1-3) "))
 	if(isLastNut(remainingNuts,take) == "true"): #Checks if the last amount taken was the last nut(s)
@@ -172,6 +177,7 @@ def aiTurn(aiHat, aiTakenHat, remainingNuts, playType):
 	move = aiChooseMove(aiHat[remainingNuts-1]) #Selects a move
 	if(playType == 0): #Disables print statement when two ais are playing
 		print("AI takes {0} nuts".format(move + 1))
+		print("")
 	aiTakenHat[remainingNuts - 1] [move]  += 1 #Adds move to taken Hat
 	if(isLastNut(remainingNuts, move + 1) == "true"):
 		#If is last nut, runs the game over statements
