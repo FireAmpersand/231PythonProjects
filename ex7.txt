@@ -1,0 +1,4 @@
+a) 42
+b) math.ceil rounds up to the nearest whole number and math.floor rounds down
+c) we have been using an exponent of 0.5 ex. 9**0.5 = 3
+d) pi and e

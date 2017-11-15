@@ -1,0 +1,63 @@
+class Cars:
+	"Creates and holds the cars location and direction"
+
+	def __init__ (self, direction, size, upMostCoor, leftMostCoor):
+		"Creates a new cars object"
+		#Setting the direction to the objects direction
+		self.direction = direction
+		self.blocking = []
+		#Test condition to determind which direction to move while inputing the location
+		if (self.direction == 'h'):
+			for i in range(int(size)):
+				self.blocking.append([int(upMostCoor),int(leftMostCoor) + i])
+		else:
+			for i in range(int(size)):
+				self.blocking.append([int(upMostCoor) + i, int(leftMostCoor)])
+
+
+class Board:
+	"Creates a Board Object"
+
+	def __init__(self, cars):
+		"Takes in all the cars, and places them on the board"
+		self.totalCars = len(cars)
+		self.allUsedPoints = []
+		for i in range(self.totalCars):
+			temp = cars[i].blocking
+			for s in range (len(temp)):
+				self.allUsedPoints.append(temp[s])
+
+		
+
+
+def game():
+	"The functions that runs the game"
+	cars = gameSetup()
+
+def gameSetup():
+	"Takes the imported board specs, and creates the car objects. Returns all cars"
+	inputList = []
+	while(1==1):
+		#Runs a infinite loop untill broken out of, looping through all inputs
+		try:
+			#Tries to call input on the file
+			currentCar = [input()] #Sets the temp list to the inputed values
+		except EOFError:
+			#If the input fails, then the while loop is exited
+			break
+		#Adds the current car to the main list
+		inputList += [currentCar]
+	cars = []
+	#Loops through all inputs and creates cars objects
+	for i in range(len(inputList)):
+		#Splits the inputed text into a list
+		temp = inputList[i][0].split(', ')
+		#Creating the current car object
+		current = Cars(temp[0],temp[1],temp[2],temp[3])
+		#Adding the new car to the list
+		cars.append(current)
+
+	gameBoard = Board(cars)
+
+
+game()
