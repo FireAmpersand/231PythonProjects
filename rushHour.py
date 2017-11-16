@@ -49,8 +49,13 @@ class Cars:
 class Board:
 	"Creates a Board Object"
 
-	def __init__(self, cars):
-		"Takes in all the cars, and places them on the board"
+	def __init__(self):
+		"Constructor for the Board class"
+		self.totalCars = 0
+		self.cars = ""
+
+	def updateBoardObject(self, cars):
+		"Used to update the board once the game has been loaded"
 		self.totalCars = len(cars)
 		self.cars = cars
 
@@ -193,23 +198,48 @@ class Board:
 
 	def gameWon(self, turns):
 		"Checks if the game has been won"
+		#Getting the cars current location
 		redCarLocation = self.cars[0].blocking
+		#Checking if the red car's farthest right point is on the exit square
 		if(redCarLocation[1][0] == 2 and redCarLocation[1][1] == 5):
 			print("You Won in {0} Turns".format(turns))
 			return 1
 		return 0
 
-	def inputGameFile(self):
+	def loadGame(self):
 		"Inputs a game board from a file, returns the list of cars"
 		inputList = []
+		gameFile = open(sys.argv[1], 'r')
 		while(1==1):
 			#Runs an infinite loop untill broken out of dure to no more text
-			
+			#Getting the current line
+			currentLine = (gameFile.readline())
+			#Testing if the current line is empty
+			if(len(currentLine) == 0):
+				#If line is empty, break out of loop
+				break
+			#Making everything stay together during merge
+			currentCar = [currentLine]
+			inputList += [currentCar]
+		#Closing the file
+		gameFile.close()
+
+		cars = []
+		#Loops through all inputs and creates car objects
+		for i in range(len(inputList)):
+			#Splits the inputed text into a list
+			carInfo = inputList[i][0].split(', ')
+			#Creating current car object
+			current = Cars(carInfo[0],carInfo[1],carInfo[2],carInfo[3])
+			#Adding the new car to the list
+			cars.append(current)
+		self.updateBoardObject(cars)
 
 def main():
 	"The function that runs the game"
 	#Setting variables for the game
-	gameBoard = gameSetup()
+	gameBoard = Board()
+	gameBoard.loadGame()
 	gameBoard.displayBoard()
 	gameOver = 0
 	turns = 0
@@ -219,21 +249,29 @@ def main():
 		carChoice = askCarNumber(gameBoard)
 		direction = askCarDirection(gameBoard,carChoice)
 		units = askAmountToMove()
+		#Sending infomation to be processed by the board
 		gameBoard.checkValidMove(carChoice,direction,units)
+		#Update the game board, regardless if move happend
 		gameBoard.displayBoard()
+		#Add 1 to the turn count
 		turns += 1
+		#Check if the game has been won
 		gameOver = gameBoard.gameWon(turns)
 
 
 def askAmountToMove():
 	"A Function used to ask how much the player would like to move the car"
+	#Asking for the input
 	units = input("How many units? ")
+	#Making sure the value is an int
 	try:
 		units = int(units)
+		#If the amount is not in bounds, ask to enter again, recall function
 		if(units < 0 or units > 4):
 			print("Please enter a number between 0-4")
 			return askAmountToMove()
 		return units
+	#If the value is not an int, recall function
 	except ValueError:
 		print("Please enter a integer")
 		return askAmountToMove()
@@ -241,61 +279,47 @@ def askAmountToMove():
 
 def askCarDirection(gameBoard, car):
 	"A Function used to ask which way the player would like to move the car"
+	#Getting the current car's direction to show which ways it can move
 	carDirection = gameBoard.cars[car].direction
 	carText = ""
+	#If the car is vertical, then only output up/down
 	if(carDirection == "v"):
 		carText = "up, down"
+	#If the car is horizontal, thn output left/right
 	elif(carDirection == 'h'):
 		carText = "left, right"
+	#Asking for input
 	direction = input("Which way would you like to move? ({0}) ".format(carText))
+	#Making the test condition easier
 	direction = direction.lower()
+	#If the car is vertical and up or down is not enteredm ask to enter again, recall function
 	if(carDirection == 'v' and (direction != "up" and direction != "down")):
 		print("Please enter up or down")
 		return askCarDirection(gameBoard, car)
+	#If the car is horizontal and left or right is not entered, ask to enter again, recall function
 	if(carDirection == 'h' and (direction != "left" and direction != "right")):
 		print("Please enter left or right")
 		return askCarDirection(gameBoard, car)
+	#Return the direction the car is moving
 	return direction
 
 
 def askCarNumber(gameBoard):
 	"A Function used to ask which car they would like move"
+	#Getting the input
 	carChoice = input("Please select a car to move ")
+	#Making sure the input is an int
 	try:
 		carChoice = int(carChoice)
+		#If the choice is out of board, call its self
 		if(carChoice < 0 or carChoice > len(gameBoard.cars) -1):
 			print("Please enter a int in the range of 0 - {0}".format(len(gameBoard.cars)-1))
 			return askCarNumber(gameBoard)
 		return carChoice
+	#If the int call fails, recall function
 	except ValueError:
 		print("Enter a valid Int Please")
 		return askCarNumber(gameBoard)
-
-def gameSetup():
-	"Takes the imported board specs, and creates the car objects. Returns all cars"
-	inputList = []
-	gameFile = open(sys.argv[1],'r')
-	while(1==1):
-		#Runs a infinite loop untill broken out of, looping through all inputs
-		currentLine = (gameFile.readline())
-		if(len(currentLine) == 0):
-			break
-		currentCar = [currentLine] #Sets the temp list to the inputed value
-		#Adds the current car to the main list
-		inputList += [currentCar]
-	gameFile.close()
-
-	cars = []
-	#Loops through all inputs and creates cars objects
-	for i in range(len(inputList)):
-		#Splits the inputed text into a list
-		temp = inputList[i][0].split(', ')
-		#Creating the current car object
-		current = Cars(temp[0],temp[1],temp[2],temp[3])
-		#Adding the new car to the list
-		cars.append(current)
-
-	return Board(cars)
 
 
 main()
