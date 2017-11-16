@@ -1,3 +1,5 @@
+import sys
+
 class Cars:
 	"Creates and holds the cars location and direction"
 
@@ -90,6 +92,8 @@ class Board:
 
 	def checkValidMove(self,car,direction,amount):
 		"Checks to make sure the reqested move is vaild"
+		car = int(car)
+		amount = int(amount)
 		#Getting car's Locations and direction
 		currentCarLocation = self.cars[car].blocking
 		currentCarDirection = self.cars[car].direction
@@ -111,27 +115,31 @@ class Board:
 			#Reseting the car's location back to what it was before
 			self.cars[car].blocking = currentCarLocation
 			#Looping through each coorinate pair
-			for i in range(len(newPossibleLocation)):
-				#Getting the current row and column in question
-				row = newPossibleLocation[i][0]
-				col = newPossibleLocation[i][1]
-				#Checking if the new location is in bounds
-				if ( row < 0 or row > 5):
-					print("Out of bounds")
-					return
-				elif( col < 0 or col > 5):
-					print("Out of Bounds")
-					return
-				#Checking if the car has a clear path to its new location
-				moveCheck = self.slideCheck(currentCarLocation, direction,amount)
-				if(moveCheck == "false"):
-					return
-				#Checking if the new location is empty
-				if (self.board[row][col] != "*"):
-					return
+			i = 0
+			if(direction == 'right' or direction == 'down'):
+				i = len(newPossibleLocation)-1
+			#Getting the current row and column in question
+			row = newPossibleLocation[i][0]
+			col = newPossibleLocation[i][1]
+			#Checking if the new location is in bounds
+			if ( row < 0 or row > 5):
+				print("Out of bounds")
+				return
+			elif( col < 0 or col > 5):
+				print("Out of Bounds")
+				return
+			#Checking if the car has a clear path to its new location
+			moveCheck = self.slideCheck(currentCarLocation, direction,amount)
+			if(moveCheck == "false"):
+				print("Invalid Move, Car in the Way")
+				return
+			#Checking if the new location is empty
+			if (self.board[row][col] != "*"):
+				print("Invalid Move, Car At Location")
+				return
 			#If no flags get triped, then the new location is set with a board update
 			self.cars[car].blocking = newPossibleLocation
-			self.displayBoard()
+
 
 	def slideCheck(self, startLocations, direction, amount):
 		"Runs a check to make sure that cars can't jump over another"
@@ -183,32 +191,100 @@ class Board:
 			#If all loop iterations pass, return true
 			return("true")
 
+	def gameWon(self, turns):
+		"Checks if the game has been won"
+		redCarLocation = self.cars[0].blocking
+		if(redCarLocation[1][0] == 2 and redCarLocation[1][1] == 5):
+			print("You Won in {0} Turns".format(turns))
+			return 1
+		return 0
+
+	def inputGameFile(self):
+		"Inputs a game board from a file, returns the list of cars"
+		inputList = []
+		while(1==1):
+			#Runs an infinite loop untill broken out of dure to no more text
+			
 
 def main():
 	"The function that runs the game"
+	#Setting variables for the game
 	gameBoard = gameSetup()
 	gameBoard.displayBoard()
 	gameOver = 0
+	turns = 0
+	#Game loop
 	while(gameOver == 0):
-		carChoice = 0 #eval(input("Please select a car to move "))
-		direction = 'right' #input("Which way would you like to move?(up/down/left/right) ")
-		units = 10 #input("How many units? ")
+		#Asking inputs 
+		carChoice = askCarNumber(gameBoard)
+		direction = askCarDirection(gameBoard,carChoice)
+		units = askAmountToMove()
 		gameBoard.checkValidMove(carChoice,direction,units)
-		gameOver = 1
+		gameBoard.displayBoard()
+		turns += 1
+		gameOver = gameBoard.gameWon(turns)
+
+
+def askAmountToMove():
+	"A Function used to ask how much the player would like to move the car"
+	units = input("How many units? ")
+	try:
+		units = int(units)
+		if(units < 0 or units > 4):
+			print("Please enter a number between 0-4")
+			return askAmountToMove()
+		return units
+	except ValueError:
+		print("Please enter a integer")
+		return askAmountToMove()
+
+
+def askCarDirection(gameBoard, car):
+	"A Function used to ask which way the player would like to move the car"
+	carDirection = gameBoard.cars[car].direction
+	carText = ""
+	if(carDirection == "v"):
+		carText = "up, down"
+	elif(carDirection == 'h'):
+		carText = "left, right"
+	direction = input("Which way would you like to move? ({0}) ".format(carText))
+	direction = direction.lower()
+	if(carDirection == 'v' and (direction != "up" and direction != "down")):
+		print("Please enter up or down")
+		return askCarDirection(gameBoard, car)
+	if(carDirection == 'h' and (direction != "left" and direction != "right")):
+		print("Please enter left or right")
+		return askCarDirection(gameBoard, car)
+	return direction
+
+
+def askCarNumber(gameBoard):
+	"A Function used to ask which car they would like move"
+	carChoice = input("Please select a car to move ")
+	try:
+		carChoice = int(carChoice)
+		if(carChoice < 0 or carChoice > len(gameBoard.cars) -1):
+			print("Please enter a int in the range of 0 - {0}".format(len(gameBoard.cars)-1))
+			return askCarNumber(gameBoard)
+		return carChoice
+	except ValueError:
+		print("Enter a valid Int Please")
+		return askCarNumber(gameBoard)
 
 def gameSetup():
 	"Takes the imported board specs, and creates the car objects. Returns all cars"
 	inputList = []
+	gameFile = open(sys.argv[1],'r')
 	while(1==1):
 		#Runs a infinite loop untill broken out of, looping through all inputs
-		try:
-			#Tries to call input on the file
-			currentCar = [input()] #Sets the temp list to the inputed values
-		except EOFError:
-			#If the input fails, then the while loop is exited
+		currentLine = (gameFile.readline())
+		if(len(currentLine) == 0):
 			break
+		currentCar = [currentLine] #Sets the temp list to the inputed value
 		#Adds the current car to the main list
 		inputList += [currentCar]
+	gameFile.close()
+
 	cars = []
 	#Loops through all inputs and creates cars objects
 	for i in range(len(inputList)):
