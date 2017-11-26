@@ -1,6 +1,6 @@
 import pygame
 import rushHour
-
+from PyZenity import *
 
 def main():
 	"Sets up the game and runs the game"
@@ -32,8 +32,9 @@ def main():
 		#If the window close event comes through, break out of the loop
 		if ev.type == pygame.QUIT:
 			break
-
+		#Checking to see if the game has been won
 		if gameBackend.gameWon(turns) == 1:
+			InfoMessage("You Won in {0} turns".format(turns))
 			break
 		#If a mouse click event comes through, record location and click numbers
 		if ev.type == pygame.MOUSEBUTTONDOWN:
@@ -51,12 +52,6 @@ def main():
 				mouseClickTwoLoc = [int(mouseClickTwoLoc[0] / gameSquareSize), int(mouseClickTwoLoc[1] / gameSquareSize)]
 				#Finding which car has been selected, calls the beckend to do a reverse lookup of the car
 				selectedCar = gameBackend.reverseCarLookup(mouseClickOneLoc)
-				#If no car is selected, then skip this iteraction of the loop
-				if selectedCar is None:
-					#Resetting the varibles
-					mouseClickOneLoc = ""
-					mousClickTwoLoc = ""
-					continue
 				#Calculating the differences between squares
 				xDifference = int(mouseClickTwoLoc[0]) - int(mouseClickOneLoc[0])
 				yDifference = int(mouseClickTwoLoc[1]) - int(mouseClickOneLoc[1])
@@ -73,11 +68,14 @@ def main():
 					#The amount to move is just the absolute value of the direction
 					amount = abs(yDifference)
 					#Send the move information to the backend for processing
-					gameBackend.checkValidMove(selectedCar, direction, amount)
-					#After move has been processed, update the internal board
-					gameBackend.updateBoard()
-					#Adds 1 to the turn count
-					turns += 1
+					try:
+						gameBackend.checkValidMove(selectedCar, direction, amount)
+						#After move has been processed, update the internal board
+						gameBackend.updateBoard()
+						#Adds 1 to the turn count
+						turns += 1
+					except:
+						ErrorMessage("Invalid Move")
 				#Checking if the reqested move is a horizontal move
 				if mouseClickTwoLoc[0] != mouseClickOneLoc[0] and mouseClickTwoLoc[1] == mouseClickOneLoc[1]:
 					#Creating a direction variable
@@ -91,14 +89,21 @@ def main():
 					#The amount is just the absolute value of the x Difference
 					amount = abs(xDifference)
 					#Sending the information to the backend for processing
-					gameBackend.checkValidMove(selectedCar, direction, amount)
-					#Adds 1 to the turn count
-					turns += 1
+					try:
+						gameBackend.checkValidMove(selectedCar, direction, amount)
+						#Adds 1 to the turn count
+						turns += 1
+					except:
+						ErrorMessage("Invalid Move")
 					#After move has been processed, update the internal board
 					gameBackend.updateBoard()
 				#Resetting the varibles after being used
 				mouseClickOneLoc = ''
 				mouseClickTwoLoc = ''
+			elif mouseClickOneLoc != '' and mouseClickTwoLoc != "":
+				print("FAIL SAFE")
+				mouseClickOneLoc = ""
+				mouseClickTwoLoc = ""
 		#Updating the squares on the board
 		grid = []
 		#Looping through each row
