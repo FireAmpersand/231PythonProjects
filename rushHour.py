@@ -1,4 +1,5 @@
 import sys
+import random
 
 class Cars:
 	"Creates and holds the cars location and direction"
@@ -7,6 +8,7 @@ class Cars:
 		"Creates a new cars object"
 		self.direction = direction
 		self.blocking = []
+		self.color = (0,0,0)
 		#Finding which Coordinates the car is blocking
 		if (self.direction == 'h'):
 			for i in range(int(size)):
@@ -46,6 +48,10 @@ class Cars:
 					self.blocking.append([oldLocation[i][0] + amount, oldLocation[0][1]])
 
 
+	def setCarColor(self, color):
+		"Changes the car's color"
+		self.color = color
+
 class Board:
 	"Creates a Board Object"
 
@@ -59,8 +65,8 @@ class Board:
 		self.totalCars = len(cars)
 		self.cars = cars
 
-	def displayBoard(self):
-		"prints out the game board to the terminal"
+	def updateBoard(self):
+		"Updates the internal board tracker"
 		self.board = []
 		#Setting every position to the defualt '*'
 		#Row loop
@@ -85,6 +91,9 @@ class Board:
 				#Setting the board location to the cars number
 				self.board[yLoc][xLoc] = i
 
+	def displayBoard(self):
+		"Prints out the board to the terminal"
+		self.updateBoard()
 		#Printing out the board to the terminal
 		#Looping through the rows
 		for row in range(6):
@@ -233,7 +242,30 @@ class Board:
 			current = Cars(carInfo[0],carInfo[1],carInfo[2],carInfo[3])
 			#Adding the new car to the list
 			cars.append(current)
+		#List holding all the colors for the cars
+		colors = [(255,0,0),(0,0,255),(0,255,0),(153,51,255),(255,102,255),(255,255,51),
+			(0,0,0),(160,160,160),(0,255,255),(153,255,51),(204,102,0),(0,153,0),
+			(0,0,153),(192,192,192),(255,128,0),(204,204,0)]
+		#Setting the colors for the cars
+		for i in range(len(cars)):
+			cars[i].setCarColor(colors[i])
+		#Update the cars object
 		self.updateBoardObject(cars)
+
+	def reverseCarLookup(self, location):
+		"Finds Which car is at the specified location"
+		#Loop for going through all cars
+		for currCar in range(self.totalCars):
+			#Setting the current car being checked
+			currentCarLocations = self.cars[currCar].blocking
+			#Looping through each position the car is on
+			for size in range(len(currentCarLocations)):
+				#Checking if the location match
+				if currentCarLocations[size][0] == location[1] and currentCarLocations[size][1] == location[0]:
+					#If the location match, return the car number
+					return currCar
+
+
 
 def main():
 	"The function that runs the game"
@@ -321,5 +353,5 @@ def askCarNumber(gameBoard):
 		print("Enter a valid Int Please")
 		return askCarNumber(gameBoard)
 
-
-main()
+if __name__ == "__main__":
+	main()
