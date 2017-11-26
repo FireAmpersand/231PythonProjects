@@ -1,5 +1,5 @@
 import pygame
-import rushHour
+import rushhour
 from PyZenity import *
 
 def main():
@@ -18,7 +18,7 @@ def main():
 	defaultSquareColor = (255,255,255)
 	defaultBorderColor = (0,0,0)
 	#Creating a backend object
-	gameBackend = rushHour.Board()
+	gameBackend = rushhour.Board()
 	#Loading in a game to play
 	gameBackend.loadGame()
 	#Variables
@@ -60,15 +60,19 @@ def main():
 					#Creating a direction variable
 					direction = ""
 					#If the y difference is negative, movement is then up
-					if yDifference < 0:
-						direction = "up"
-					#If the y difference is positive, movement is then down
-					elif yDifference > 0:
-						direction = "down"
-					#The amount to move is just the absolute value of the direction
-					amount = abs(yDifference)
-					#Send the move information to the backend for processing
 					try:
+						if yDifference < 0:
+							direction = "up"
+							mouseClickOneLoc = gameBackend.cars[selectedCar].blocking[0]
+							yDifference = int(mouseClickTwoLoc[1]) - int(mouseClickOneLoc[0])
+						#If the y difference is positive, movement is then down
+						elif yDifference > 0:
+							direction = "down"
+							mouseClickOneLoc = gameBackend.cars[selectedCar].blocking[len(gameBackend.cars[selectedCar].blocking) - 1]
+							yDifference = int(mouseClickTwoLoc[1]) - int(mouseClickOneLoc[0])
+						#The amount to move is just the absolute value of the direction
+						amount = abs(yDifference)
+						#Send the move information to the backend for processing
 						gameBackend.checkValidMove(selectedCar, direction, amount)
 						#After move has been processed, update the internal board
 						gameBackend.updateBoard()
@@ -77,19 +81,23 @@ def main():
 					except:
 						ErrorMessage("Invalid Move")
 				#Checking if the reqested move is a horizontal move
-				if mouseClickTwoLoc[0] != mouseClickOneLoc[0] and mouseClickTwoLoc[1] == mouseClickOneLoc[1]:
+				elif mouseClickTwoLoc[0] != mouseClickOneLoc[0] and mouseClickTwoLoc[1] == mouseClickOneLoc[1]:
 					#Creating a direction variable
 					direction = ""
-					#If the x difference is negative, movement is then left
-					if xDifference < 0:
-						direction = "left"
-					#If x difference is positive, movement is then right
-					elif xDifference > 0:
-						direction = "right"
-					#The amount is just the absolute value of the x Difference
-					amount = abs(xDifference)
-					#Sending the information to the backend for processing
 					try:
+						#If the x difference is negative, movement is then left
+						if xDifference < 0:
+							direction = "left"
+							mouseClickOneLoc = gameBackend.cars[selectedCar].blocking[0]
+							xDifference = int(mouseClickTwoLoc[0]) - int(mouseClickOneLoc[1])
+						#If x difference is positive, movement is then right
+						elif xDifference > 0:
+							direction = "right"
+							mouseClickOneLoc = gameBackend.cars[selectedCar].blocking[len(gameBackend.cars[selectedCar].blocking) - 1]
+							xDifference = int(mouseClickTwoLoc[0]) - int(mouseClickOneLoc[1])
+						#The amount is just the absolute value of the x Difference
+						amount = abs(xDifference)
+						#Sending the information to the backend for processing
 						gameBackend.checkValidMove(selectedCar, direction, amount)
 						#Adds 1 to the turn count
 						turns += 1
