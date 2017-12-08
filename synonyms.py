@@ -3,7 +3,6 @@
 
 Author: Michael Guerzhoy. Last modified: Nov. 18, 2015.
 '''
-
 import math
 
 
@@ -11,11 +10,10 @@ def norm(vec):
     '''Return the norm of a vector stored as a dictionary,
     as described in the handout for Project 3.
     '''
-    
+
     sum_of_squares = 0.0  # floating point to handle large numbers
     for x in vec:
         sum_of_squares += vec[x] * vec[x]
-    
     return math.sqrt(sum_of_squares)
 
 
@@ -52,14 +50,17 @@ def cosine_similarity(vec1, vec2):
 	return(cosineValue)
 
 def build_semantic_descriptors(sentences):
+	"Creates a semantic descriptors dictionary from a list of sentences"
 	#The master dictionary containing the semantic descriptors
 	master = {}
+	#print(sentences)
 	#Looping through each sentence list
 	for currSen in range(len(sentences)):
 		#Looping through each word in the current sentence 
 		for currWord in sentences[currSen]:
 			#If the current word hasn't had a 'mini' dictionary created, then build one
 			if currWord not in master:
+				#print("running : {0}".format(currWord))
 				master[currWord] = build_smaller_dictionary(sentences, currWord)
 	#Return the master dictionary
 	return(master)
@@ -87,8 +88,47 @@ def build_smaller_dictionary(sentences, targetWord):
 
 
 def build_semantic_descriptors_from_files(filenames):
-    pass
+	"Imports the text from the files provided, returns the semantic descriptors"
+	#Master text variable
+	text = ""
+	#Looping through all the files
+	for i in range(len(filenames)):
+		#Setting the current file
+		file = open(filenames[i], "r", encoding="utf-8")
+		#Looping indefinalty untill there is nothing left in the file
+		while(1==1):
+			#Getting the current line
+			currentLine = file.readline()
+			#If the line has nothing, break out
+			if len(currentLine) == 0:
+				break
+			#Adding the currentLine to the master text 
+			text += currentLine
+	#Changing to lower case, and then removing other puncuation
+	text = text.lower()
+	text = text.replace(",", "")
+	text = text.replace("-", "")
+	text = text.replace("--","")
+	text = text.replace(":","")
+	text = text.replace(";","")
+	text = text.replace('"','')
+	text = text.replace("'", "")
+	text = text.replace("?",".")
+	text = text.replace("!",".")
+	text = text.replace("(", "")
+	text = text.replace(")", "")
+	#Splitting the text by either '.' , '?' or '!'
+	tempSentences = text.split(".")
+	#Master sentence variable
+	sentences = []
+	#Looping through the previous split to format properly
+	for i in range(len(tempSentences)):
+		#Making sure to remove a newline character
+		if len(tempSentences[i]) != 1:
+			#Adding to the master sentence
+			sentences.append(tempSentences[i].split())
 
+	return(build_semantic_descriptors(sentences))
 
 
 def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
@@ -99,10 +139,6 @@ def run_similarity_test(filename, semantic_descriptors, similarity_fn):
     pass
 
 
-cosine_similarity({"a":1, "b":2, "c":3}, {"b":4, "c":5, "d":6})
-build_semantic_descriptors([["i", "am", "a", "sick", "man"],
-			    ["i", "am", "a", "spiteful", "man"],
-			    ["i", "am", "an", "unattractive", "man"],
-			    ["i", "believe", "my", "liver", "is", "diseased"],
-			    ["however", "i", "know", "nothing", "at", "all", "about", "my", 
-			     "disease", "and", "do", "not", "know", "for", "certain", "what", "ails", "me"]])
+#build_semantic_descriptors_from_files(["underground.txt"])
+des = build_semantic_descriptors_from_files(["pg7178.txt"])
+#most_similar_word(
